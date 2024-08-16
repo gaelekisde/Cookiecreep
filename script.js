@@ -1,7 +1,12 @@
-function getNumber() {
-    let value = document.getElementById('value');
-    const numero = parseFloat(value.value);
-    const valuefinal = numero + 1;
-
-    document.getElementById('result').innerText = `¿ahh si? pues gael te ama ${numero}`;
+function mostrarMas() {
+    var textoAdicional = document.getElementById('textoAdicional');
+    var verMasBtn = document.getElementById('verMasBtn');
+    
+    if (textoAdicional.style.display === 'none') {
+        textoAdicional.style.display = 'block';
+        verMasBtn.textContent = 'Ver menos';
+    } else {
+        textoAdicional.style.display = 'none';
+        verMasBtn.textContent = 'Ver más';
+    }
 }
