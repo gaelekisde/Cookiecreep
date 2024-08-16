@@ -2,13 +2,22 @@
     margin: 0;
     padding: 0;
 }
-
 .title{
     width: 100%;
 }
 .title h1{
     font-size: 100px;
 }
-.input-number{
+.contenedor-form{
+    border: solid;
+    text-align: center;
     width: 100%;
+    height: 50%;
+}
+.contenedor-form input{
+    width: 100%;
+    font-size: 50px;
+} 
+.contenedor-form button{
+    
 }
