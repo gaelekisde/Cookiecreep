@@ -4,9 +4,9 @@ function mostrarMas() {
     
     if (textoAdicional.style.display === 'none') {
         textoAdicional.style.display = 'block';
-        verMasBtn.textContent = 'Ver menos';
+        verMasBtn.textContent = 'Cerrar sentimientos de gaelin';
     } else {
         textoAdicional.style.display = 'none';
-        verMasBtn.textContent = 'Ver que siente Gael por mí';
+        verMasBtn.textContent = 'Ver sentimientos de gaelin';
     }
 }
