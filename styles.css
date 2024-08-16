@@ -1,3 +1,4 @@
+
 body {
     font-family: Arial, sans-serif;
     background-color: #ffe5ec;
@@ -7,6 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow-x: hidden;
 }
 
 .container {
@@ -15,23 +17,24 @@ body {
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-    color: #e63946;
-    margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+    max-width: 90vw; /* Ajusta para dispositivos móviles */
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 p {
     color: #333;
-    font-size: 18px;
+    font-size: 16px; /* Ajustado para dispositivos móviles */
     margin-bottom: 15px;
 }
 
 .image {
     border-radius: 50%;
     margin-bottom: 20px;
-    width: 100%;
+    width: 80%; /* Ajustado para dispositivos móviles */
+    max-width: 300px;
 }
 
 button {
@@ -39,11 +42,38 @@ button {
     color: #fff;
     border: none;
     border-radius: 5px;
-    padding: 5px 10px;
+    padding: 10px 20px;
     cursor: pointer;
     font-size: 16px;
 }
 
 button:hover {
     background-color: #d62828;
+}
+
+#textoAdicional {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: none; /* Inicialmente oculto */
+    position: relative;
+    z-index: 1; /* Asegura que no tape otros elementos importantes */
+    max-height: 60vh; /* Limita la altura en dispositivos móviles */
+    overflow-y: auto; /* Agrega barra de desplazamiento si es necesario */
+}
+
+#verMasBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+#verMasBtn:hover {
+    background-color: #0056b3;
 }

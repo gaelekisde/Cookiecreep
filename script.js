@@ -7,6 +7,6 @@ function mostrarMas() {
         verMasBtn.textContent = 'Ver menos';
     } else {
         textoAdicional.style.display = 'none';
-        verMasBtn.textContent = 'Ver más';
+        verMasBtn.textContent = 'Ver que siente Gael por mí';
     }
 }
