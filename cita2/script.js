@@ -1,5 +1,5 @@
 // Fecha y hora del encuentro
-const targetDate = new Date("Sep 7, 2024 15:00:00").getTime();
+const targetDate = new Date("Sep 14, 2024 15:00:00").getTime();
 
 const countdown = () => {
     const now = new Date().getTime();
