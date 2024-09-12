@@ -1,12 +1,237 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citas</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultar Citas</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Citas</h1>
-    <script></script>
+  <h1>Listado de Citas</h1>
+  <center>
+    <button id="fetchDataBtn">Cargar Citas</button>
+  </center>
+  <div id="citasContainer" style="display: none;"></div>
+
+  <h1>Crear una Cita</h1>
+  <form id="citaForm">
+      <label for="fecha">Fecha y Hora:</label>
+      <input type="datetime-local" id="fecha" name="fecha" required><br><br>
+
+      <label for="lugar">Lugar:</label>
+      <input type="text" id="lugar" name="lugar" required><br><br>
+
+      <label for="descripcion">Descripción:</label>
+      <textarea id="descripcion" name="descripcion" required></textarea><br><br>
+
+      <label for="status">Estado:</label>
+      <select id="status" name="status" required>
+          <option value="pendiente">Pendiente</option>
+          <option value="realizada">Realizada</option>
+      </select><br><br>
+
+      <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    document.getElementById('citaForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); // Evita el envío tradicional del formulario
+  
+      const citaData = {
+        fecha: document.getElementById('fecha').value.replace("T", " "),  // Formato compatible con tu base de datos
+        lugar: document.getElementById('lugar').value,
+        descripcion: document.getElementById('descripcion').value,
+        status: document.getElementById('status').value
+      };
+  
+      try {
+        const response = await fetch('https://cookieapi-rtjy.onrender.com/api/citar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(citaData)
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Éxito:', data);
+          // Muestra un mensaje de éxito al usuario
+          alert('Cita creada con éxito!');
+        } else {
+          const errorData = await response.json();
+          console.error('Error:', errorData);
+          // Muestra un mensaje de error al usuario
+          alert('Error al crear la cita. Inténtalo de nuevo.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        // Muestra un mensaje de error al usuario
+        alert('Error de red. Por favor, verifica tu conexión.');
+      }
+    });
+  </script>
+  
+
+  <script>
+    let citasCargadas = false; // Para saber si las citas ya fueron cargadas
+  
+    document.getElementById('fetchDataBtn').addEventListener('click', function() {
+      const citasContainer = document.getElementById('citasContainer');
+  
+      // Si las citas están ocultas, mostramos y cargamos las citas
+      if (citasContainer.style.display === 'none') {
+        citasContainer.style.display = 'block'; // Mostrar citas
+  
+        if (!citasCargadas) { // Solo cargar si no han sido cargadas
+          fetch('https://cookieapi-rtjy.onrender.com/api/citas')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Error al obtener los datos');
+              }
+              return response.json();
+            })
+            .then(data => {
+              citasContainer.innerHTML = ''; // Limpiar antes de agregar nuevas citas
+  
+              data.forEach(cita => {
+                const citaElement = document.createElement('div');
+                citaElement.classList.add('cita');
+  
+                citaElement.innerHTML = `
+                  <img src="${cita.imagen_url || 'default-image.jpg'}" alt="${cita.descripcion}">
+                  <div class="cita-info">
+                    <h3>${cita.lugar}</h3>
+                    <p><strong>Fecha:</strong> ${new Date(cita.fecha).toLocaleString()}</p>
+                    <p><strong>Descripción:</strong> ${cita.descripcion}</p>
+                    <p class="status ${cita.status}"><strong>Status:</strong> ${cita.status}</p>
+                  </div>
+                  <form class="uploadImageForm" data-id="${cita.id}" enctype="multipart/form-data">
+                    <label for="imagen">Añadir Imagen:</label>
+                    <input type="file" name="imagen" class="imagenInput" accept="image/*" required>
+                    <button type="submit">Subir Imagen</button>
+                  </form>
+                  <form class="updateStatusForm" data-id="${cita.id}">
+                    <label for="newStatus">Actualizar Estado:</label>
+                    <select name="newStatus" class="newStatusSelect" required>
+                        <option value="pendiente" ${cita.status === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="realizada" ${cita.status === 'realizada' ? 'selected' : ''}>Realizada</option>
+                    </select>
+                    <button type="submit">Actualizar Estado</button>
+                  </form>
+                  <button class="deleteCitaBtn" data-id="${cita.id}">Eliminar Cita</button> <!-- Botón de eliminar -->
+                `;
+                citasContainer.appendChild(citaElement);
+  
+                // Añadir evento para subir la imagen al submit del formulario de cada cita
+                citaElement.querySelector('.uploadImageForm').addEventListener('submit', async function(e) {
+                  e.preventDefault(); // Evitar envío por defecto
+  
+                  const citaId = this.getAttribute('data-id');
+                  const formData = new FormData();
+                  const imagenFile = this.querySelector('.imagenInput').files[0];
+  
+                  if (!imagenFile) {
+                    alert('Por favor selecciona una imagen.');
+                    return;
+                  }
+  
+                  formData.append('image', imagenFile);
+  
+                  try {
+                    const response = await fetch(`https://cookieapi-rtjy.onrender.com/api/citas/upload/${citaId}`, {
+                      method: 'PATCH',
+                      body: formData,
+                    });
+  
+                    if (response.ok) {
+                      alert('Imagen subida con éxito!');
+                      // Opcional: Actualizar la vista con la nueva imagen
+                    } else {
+                      alert('Error al subir la imagen.');
+                    }
+                  } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error de red. Por favor, intenta de nuevo.');
+                  }
+                });
+  
+                // Añadir evento para actualizar el estado de la cita
+                citaElement.querySelector('.updateStatusForm').addEventListener('submit', async function(e) {
+                  e.preventDefault(); // Evitar envío por defecto
+  
+                  const citaId = this.getAttribute('data-id');
+                  const newStatus = this.querySelector('.newStatusSelect').value;
+  
+                  try {
+                    const response = await fetch(`https://cookieapi-rtjy.onrender.com/api/citas/status/${citaId}`, {
+                      method: 'PATCH',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({ status: newStatus })
+                    });
+  
+                    if (response.ok) {
+                      // Actualizar el estado en la interfaz de usuario si es necesario
+                      const statusElement = this.closest('.cita').querySelector('.cita-info .status');
+                      if (statusElement) {
+                        statusElement.textContent = `Status: ${newStatus}`;
+                        statusElement.className = `status ${newStatus}`;
+                      }
+                      alert('Estado actualizado con éxito!');
+                    } else {
+                      alert('Error al actualizar el estado.');
+                    }
+                  } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error de red. Por favor, intenta de nuevo.');
+                  }
+                });
+  
+                // Añadir evento para eliminar la cita
+                citaElement.querySelector('.deleteCitaBtn').addEventListener('click', async function() {
+                  const citaId = this.getAttribute('data-id');
+  
+                  if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+                    try {
+                      const response = await fetch(`https://cookieapi-rtjy.onrender.com/api/citas/${citaId}`, {
+                        method: 'DELETE'
+                      });
+  
+                      if (response.ok) {
+                        // Eliminar la cita del DOM
+                        this.closest('.cita').remove();
+                        alert('Cita eliminada con éxito!');
+                      } else {
+                        alert('Error al eliminar la cita.');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                      alert('Error de red. Por favor, intenta de nuevo.');
+                    }
+                  }
+                });
+              });
+  
+              citasCargadas = true; // Marcar que ya se han cargado las citas
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Error al cargar citas.');
+            });
+        }
+  
+        // Cambiar el texto del botón
+        this.textContent = 'Ocultar Citas';
+  
+      } else {
+        // Si las citas están visibles, ocultarlas
+        citasContainer.style.display = 'none';
+        this.textContent = 'Cargar Citas'; // Cambiar el texto del botón
+      }
+    });
+  </script>
+  
 </body>
 </html>
