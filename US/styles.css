@@ -86,7 +86,7 @@ button:hover {
 /* Responsivo para pantallas pequeñas */
 @media (max-width: 600px) {
   h1 {
-      font-size: 1.5rem;
+      font-size: 3rem;
   }
 
   form {
