@@ -26,33 +26,67 @@
                 if (!response.ok) {
                     throw new Error('Error al obtener las imágenes');
                 }
-
+    
                 const data = await response.json();
                 const imageContainer = document.getElementById('imageContainer');
-
+    
                 // Limpiar contenedor en caso de que tenga contenido previo
                 imageContainer.innerHTML = '';
-
+    
                 // Iterar sobre las imágenes recibidas y mostrarlas en la página
                 data.images.forEach(image => {
-                    const imageBox = document.createElement('div');
-                    imageBox.classList.add('image-box');
+    const imageBox = document.createElement('div');
+    imageBox.classList.add('image-box');
 
-                    const imgElement = document.createElement('img');
-                    imgElement.src = image.url;
-                    imgElement.alt = `Imagen ${image.id}`;
+    const imgElement = document.createElement('img');
+    imgElement.src = image.url;
+    imgElement.alt = `Imagen ${image.id}`;
 
-                    imageBox.appendChild(imgElement);
-                    imageContainer.appendChild(imageBox);
-                });
+    // Crear botón de eliminar
+    document.createElement('br');
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Eliminar';
+    let count = 0;
+    
+    deleteButton.addEventListener('click', () => {
+        count++;
+        if (count === 2) {
+            deleteImage(image.id);
+        }
+    });
+
+    imageBox.appendChild(imgElement);
+    imageBox.appendChild(deleteButton);
+    imageContainer.appendChild(imageBox);
+});
+
             } catch (error) {
                 console.error('Error:', error);
             }
         }
-
+    
+        async function deleteImage(imageId) {
+            try {
+                const response = await fetch(`https://cookieapi-rtjy.onrender.com/api/images/${imageId}`, {
+                    method: 'DELETE',
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Error al eliminar la imagen');
+                }
+    
+                console.log(`Imagen ${imageId} eliminada`);
+                // Recargar imágenes después de eliminar una
+                fetchImages();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    
         // Llamar a la función para obtener y mostrar las imágenes
         fetchImages();
     </script>
+    
 
     <script>
         const uploadForm = document.getElementById('uploadForm');
